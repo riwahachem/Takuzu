@@ -1,0 +1,11 @@
+Package: TakuzuGame
+Title: Bibliothèque pour le jeu Takuzu
+Version: 0.1.0
+Authors@R: 
+    person("Riwa", "Hachem Reda", "riwahachemreda@gmail.com")
+    person("Wahel","El Mazzouji", "wahel.el-mazzouji@etu.umontpellier.fr")
+Description: Ce package fournit les fonctions de base permettant de jouer au Takuzu.
+License: MIT
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
