@@ -1,186 +1,201 @@
-#' @title Paramétrage du niveau pour une grille de Takuzu
-#' @description
-#' Cette fonction indique combien de cases seront retirées dans une grille 8×8
-#' pour un certain niveau de difficulté.
-#'
-#' @param niveau Un texte parmi : "Débutant", "Amateur", "Intermédiaire" ou "Expert".
-#' @return Un entier correspondant au nombre de cases à supprimer.
-#' @export
-#'
-parametre <- function(niveau) {
-  suppr_par_niveau <- list("Débutant" = 16,"Amateur" = 24,"Intermédiaire" = 32,"Expert" = 44)
-  return(suppr_par_niveau[[niveau]])
-}
+choisir_difficulte <- function(taille, niveau) {
+  # Initialisation du nombre de cases à remplir
+  nb_cases <- 0
+  if (niveau == "Facile") {
+    nb_cases <- taille * taille * 0.5
+  } else if (niveau == "Normal") {
+    nb_cases <- taille * taille * 0.4
+  } else if (niveau == "Difficile") {
+    nb_cases <- taille * taille * 0.2
+  } else {
+    stop("Veuillez choisir un niveau parmi : Facile, Normal, Difficile")
+  }
 
-#' @title Vérifier la validité d'une grille 
-#'
-#' @description
-#' Cette fonction contrôle qu'une grille terminée satisfait
-#' toutes les règles du jeu :
-#' \enumerate{
-#'   \item Il ne doit pas y avoir de \code{NA} (chaque case est un 0 ou un 1).
-#'   \item Chaque ligne et chaque colonne contient autant de 0 que de 1.
-#'   \item Aucune suite de trois chiffres identiques (000 ou 111).
-#'   \item Toutes les lignes sont différentes entre elles, et toutes les colonnes sont différentes entre elles.
-#' }
-#'
-#' @param grille Une matrice 8x8
-#'
-#' @return \code{TRUE} si la grille est valide, \code{FALSE} sinon.
-#'
-#' @export
-#'
-verifier <- function(grille) {
-  # Pas de case vide
-  if (any(is.na(grille))) {
-    return(FALSE)
-  }
-  
-  # Que des 0 et des 1
-  valeurs_uniques <- unique(as.vector(grille))
-  if (!all(valeurs_uniques %in% c(0, 1))) {
-    return(FALSE)
-  }
-  
-  # Autant de 0 que de 1
-  for (i in 1:8) {
-    ligne <- grille[i, ]
-    colonne <- grille[, i]
-    if ((sum(ligne == 0) != sum(ligne == 1)) || (sum(colonne == 0) != sum(colonne == 1))){
-      return(FALSE)
-    }
-  }
-  
-  # Pas de 000, 111
-  for (i in 1:8) {
-    ligne <- grille[i, ]
-    colonne <- grille[, i]
-    for (k in 1:6) {
-      if (ligne[k] == ligne[k + 1] && ligne[k] == ligne[k + 2]) {
-        return(FALSE)
-      }
-      if (colonne[k] == colonne[k + 1] && colonne[k] == colonne[k + 2]) {
-        return(FALSE)
-      }
-    }
-  }
-  
-  # Pas de ligne/colonne identiques
-  lignes_concat <- apply(grille, 1, paste, collapse = "")
-  if (length(unique(lignes_concat)) != length(lignes_concat)) {
-    return(FALSE)
-  }
-  colonnes_concat <- apply(grille, 2, paste, collapse = "")
-  if (length(unique(colonnes_concat)) != length(colonnes_concat)) {
-    return(FALSE)
-  }
-  
-  return(TRUE)
+  return(round(nb_cases))
 }
+generer_takuzu <- function(taille, niveau) {
+  nb_cases_prepremplies <- choisir_difficulte(taille, niveau)
+  grille <- matrix(NA, nrow = taille, ncol = taille)
 
-#' @title Générer une grille de Takuzu complète (solution)
-#'
-#' @description
-#' Cette fonction génère une grille 8×8 entièrement remplie,
-#' qui respecte les règles du Takuzu.
-#'
-#' @details
-#' L'algorithme utilise le backtracking pour remplir la grille
-#' en vérifiant progressivement les contraintes.
-#'
-#' @return Une matrice 8×8 de 0 et 1, conforme aux règles de Takuzu
-#' (et validée par \code{\link{verifier}}).
-#'
-#' @export
-generer_grille_solution <- function() {
-  grille <- matrix(NA, nrow = 8, ncol = 8)
-  
-  # Vérification locale
-  peut_placer <- function(g, i, j, val) {
-    g[i, j] <- val
-    # Vérifie qu'on n'a pas déjà plus de 4 zeros ou 4 uns dans la ligne/colonne
-    ligne   <- g[i, ]
-    colonne <- g[, j]
-    if (sum(ligne == 0, na.rm = TRUE) > 4 || sum(ligne == 1, na.rm = TRUE) > 4) {
-      return(FALSE)
+  est_valide <- function(grille, i, j, val) {
+    grille[i, j] <- val
+    ligne <- grille[i, ]
+    colonne <- grille[, j]
+
+    grille[i, j] <- NA  # Réinitialiser après test
+
+    # Vérifier équilibre 0/1
+    if (sum(ligne == 0, na.rm = TRUE) > taille / 2 || sum(ligne == 1, na.rm = TRUE) > taille / 2) return(FALSE)
+    if (sum(colonne == 0, na.rm = TRUE) > taille / 2 || sum(colonne == 1, na.rm = TRUE) > taille / 2) return(FALSE)
+
+    # Vérifier absence de trois chiffres consécutifs
+    check_rle <- function(vec) {
+      runs <- rle(vec)
+      return(!any(runs$lengths > 2, na.rm = TRUE))
     }
-    if (sum(colonne == 0, na.rm = TRUE) > 4 || sum(colonne == 1, na.rm = TRUE) > 4) {
-      return(FALSE)
-    }
-    # Vérifie l'absence de 000 ou 111
-    ligne_str   <- paste(ligne, collapse = "")
-    colonne_str <- paste(colonne, collapse = "")
-    if (grepl("000|111", ligne_str) || grepl("000|111", colonne_str)) {
-      return(FALSE)
-    }
-    return(TRUE)
+
+    return(check_rle(ligne) && check_rle(colonne))
   }
-  
-  # Fonction récursive
-  remplir_case <- function(index) {
-    if (index > 64) {
-      # Vérification finale
-      if (verifier(grille)) {
-        return(TRUE)
-      } else {
-        return(FALSE)
-      }
-    }
-    i <- ((index - 1) %/% 8) + 1
-    j <- ((index - 1) %%  8) + 1
-    
-    for (val in c(0, 1)) {
-      if (peut_placer(grille, i, j, val)) {
+
+  remplir_grille <- function(i, j) {
+    if (i > taille) return(TRUE)  # Fin de la grille
+
+    next_i <- ifelse(j == taille, i + 1, i)
+    next_j <- ifelse(j == taille, 1, j + 1)
+
+    if (!is.na(grille[i, j])) return(remplir_grille(next_i, next_j))
+
+    valeurs <- sample(c(0, 1))  # Choix aléatoire
+
+    for (val in valeurs) {
+      if (est_valide(grille, i, j, val)) {
         grille[i, j] <<- val
-        if (remplir_case(index + 1)) {
-          return(TRUE)
-        }
-        grille[i, j] <<- NA
+        if (remplir_grille(next_i, next_j)) return(TRUE)
+        grille[i, j] <<- NA  # Backtrack
       }
     }
     return(FALSE)
   }
-  
-  # Lancement du backtracking
-  success <- remplir_case(1)
-  if (!success) {
-    stop("Impossible de générer une grille solution (cas très rare).")
-  }
-  
+
+  remplir_grille(1, 1)
+
+  # Retirer des cases pour correspondre au niveau
+  indices <- sample(1:(taille^2), taille^2 - nb_cases_prepremplies)
+  grille[indices] <- NA
+
   return(grille)
 }
 
-#' @title Créer un puzzle de Takuzu
-#'
-#' @description
-#' Cette fonction génère une grille 8×8 incomplète
-#' en supprimant un nombre de cases (remplacées par \code{NA})
-#' selon le niveau de difficulté.
-#'
-#' @param niveau Une chaîne de caractères parmi : "débutant", "amateur",
-#' "intermédiaire" ou "expert". Voir \code{\link{parametre}}.
-#'
-#' @return Une matrice 8×8 partiellement remplie de 0, 1 et \code{NA},
-#' selon le niveau choisi.
-#'
-#' @export
-creer_puzzle <- function(niveau = "débutant") {
-  # Générer une grille solution
-  sol <- generer_grille_solution()
-  
-  # Nombre de cases à retirer
-  nb_a_supprimer <- parametre(niveau)
-  
-  # Retirer aléatoirement nb_a_supprimer positions
-  indices_tous  <- 1:64
-  indices_suppr <- sample(indices_tous, size = nb_a_supprimer, replace = FALSE)
-  
-  puzzle <- sol
-  for (idx in indices_suppr) {
-    i <- ((idx - 1) %/% 8) + 1
-    j <- ((idx - 1) %%  8) + 1
-    puzzle[i, j] <- NA
+verifier_takuzu <- function(grille) {
+  taille <- ncol(grille)
+
+  # Vérifie si la grille contient uniquement des 0 et des 1
+  if (!all(grille %in% c(0, 1))) return(FALSE)
+
+  # Vérifie si chaque ligne et colonne a exactement la moitié de 0 et de 1
+  verification_equilibre <- function(vec) sum(vec) == taille / 2
+  if (any(rowSums(grille) != taille / 2) || any(colSums(grille) != taille / 2)) return(FALSE)
+
+  # Vérifie s'il y a plus de 2 chiffres identiques consécutifs
+  verification_suite <- function(vec) {
+    for (i in seq_len(length(vec) - 2)) {
+      if (vec[i] == vec[i + 1] && vec[i] == vec[i + 2]) return(FALSE)
+    }
+    return(TRUE)
   }
-  
-  return(puzzle)
+  if (any(apply(grille, 1, verification_suite)) || any(apply(grille, 2, verification_suite))) return(FALSE)
+
+  # Vérifie l'unicité des lignes et colonnes
+  verification_unicite <- function(mat) {
+    lignes <- apply(mat, 1, paste, collapse = "")
+    return(length(unique(lignes)) == nrow(mat))
+  }
+  if (!verification_unicite(grille) || !verification_unicite(t(grille))) return(FALSE)
+
+  return(TRUE)
+}
+donner_indice <- function(grille) {
+  taille <- nrow(grille)
+  indices <- list()
+
+  # Fonction pour vérifier s'il y a deux chiffres identiques consécutifs
+  verifier_paire <- function(ligne, valeur) {
+    for (i in 1:(length(ligne) - 1)) {
+      if (!is.na(ligne[i]) && !is.na(ligne[i + 1]) &&
+          ligne[i] == valeur && ligne[i + 1] == valeur) {
+        # Si on trouve une paire, on regarde à gauche et à droite
+        if (i > 1 && is.na(ligne[i - 1])) {
+          return(c(i - 1, 1 - valeur))  # Position et valeur à placer
+        } else if (i < length(ligne) - 1 && is.na(ligne[i + 2])) {
+          return(c(i + 2, 1 - valeur))  # Position et valeur à placer
+        }
+      }
+    }
+    return(NULL)
+  }
+
+  # Vérifier l'équilibre 0/1 dans chaque ligne et colonne
+  verifier_equilibre <- function(ligne) {
+    if (sum(ligne == 0, na.rm = TRUE) == taille / 2) {
+      # Si on a déjà atteint le max de 0, les cases NA doivent être 1
+      for (i in 1:length(ligne)) {
+        if (is.na(ligne[i])) {
+          return(c(i, 1))
+        }
+      }
+    } else if (sum(ligne == 1, na.rm = TRUE) == taille / 2) {
+      # Si on a déjà atteint le max de 1, les cases NA doivent être 0
+      for (i in 1:length(ligne)) {
+        if (is.na(ligne[i])) {
+          return(c(i, 0))
+        }
+      }
+    }
+    return(NULL)
+  }
+
+  # Chercher les paires dans les lignes
+  for (i in 1:taille) {
+    # Chercher les paires de 0
+    resultat <- verifier_paire(grille[i, ], 0)
+    if (!is.null(resultat)) {
+      return(list(type = "ligne", indice = paste("Dans la ligne", i, "à la position", resultat[1],
+                                                 "vous devez placer un", resultat[2],
+                                                 "pour éviter trois 0 consécutifs.")))
+    }
+
+    # Chercher les paires de 1
+    resultat <- verifier_paire(grille[i, ], 1)
+    if (!is.null(resultat)) {
+      return(list(type = "ligne", indice = paste("Dans la ligne", i, "à la position", resultat[1],
+                                                 "vous devez placer un", resultat[2],
+                                                 "pour éviter trois 1 consécutifs.")))
+    }
+
+    # Vérifier l'équilibre dans la ligne
+    resultat <- verifier_equilibre(grille[i, ])
+    if (!is.null(resultat)) {
+      return(list(type = "ligne", indice = paste("Dans la ligne", i, "à la position", resultat[1],
+                                                 "vous devez placer un", resultat[2],
+                                                 "car vous avez déjà le maximum de", 1 - resultat[2], "dans cette ligne.")))
+    }
+  }
+
+  # Chercher les paires dans les colonnes
+  for (j in 1:taille) {
+    # Chercher les paires de 0
+    resultat <- verifier_paire(grille[, j], 0)
+    if (!is.null(resultat)) {
+      return(list(type = "colonne", indice = paste("Dans la colonne", j, "à la position", resultat[1],
+                                                   "vous devez placer un", resultat[2],
+                                                   "pour éviter trois 0 consécutifs.")))
+    }
+
+    # Chercher les paires de 1
+    resultat <- verifier_paire(grille[, j], 1)
+    if (!is.null(resultat)) {
+      return(list(type = "colonne", indice = paste("Dans la colonne", j, "à la position", resultat[1],
+                                                   "vous devez placer un", resultat[2],
+                                                   "pour éviter trois 1 consécutifs.")))
+    }
+
+    # Vérifier l'équilibre dans la colonne
+    resultat <- verifier_equilibre(grille[, j])
+    if (!is.null(resultat)) {
+      return(list(type = "colonne", indice = paste("Dans la colonne", j, "à la position", resultat[1],
+                                                   "vous devez placer un", resultat[2],
+                                                   "car vous avez déjà le maximum de", 1 - resultat[2], "dans cette colonne.")))
+    }
+  }
+
+  # Si aucun indice spécifique n'est trouvé, donner un indice générique
+  cases_vides <- which(is.na(grille), arr.ind = TRUE)
+  if (nrow(cases_vides) > 0) {
+    case_aleatoire <- cases_vides[sample(nrow(cases_vides), 1), ]
+    return(list(type = "general", indice = paste("Essayez de remplir la case à la ligne",
+                                                 case_aleatoire[1], "et à la colonne", case_aleatoire[2],
+                                                 "en vous basant sur les règles du jeu.")))
+  }
+
+  return(list(type = "aucun", indice = "La grille semble complète. Vérifiez si elle respecte toutes les règles du jeu."))
 }
