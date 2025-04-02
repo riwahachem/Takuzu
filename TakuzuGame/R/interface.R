@@ -15,10 +15,10 @@ interface <- dashboardPage(
       tabItem(tabName = "play",
               fluidRow(
                 box(width = 4, title = "Paramètres",
-                    selectInput("grid_size", "Taille de la grille", choices = c(4, 6, 8), selected = 8),
-                    selectInput("niveau", "Niveau de difficulté", choices = c("Facile", "Moyen", "Difficile", "Einstein"), selected = "Moyen"),
+                    selectInput("niveau", "Niveau de difficulté", choices = c("Facile", "Normal", "Difficile"), selected = "Normal"),
                     actionButton("new_game", "Nouvelle Partie"),
                     actionButton("check_grid", "Vérifier"),
+                    actionButton("hint", "Indice"),  # Bouton pour l'indice
                     textOutput("result"),
                     textOutput("timer")
                 ),
@@ -50,4 +50,3 @@ interface <- dashboardPage(
     )
   )
 )
-
