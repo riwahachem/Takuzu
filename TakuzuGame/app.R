@@ -9,5 +9,5 @@ source("R/interface.R")
 source("R/serveur.R")
 
 # Lancer l'application Shiny
-shinyApp(ui = interface, server = server)
+shinyApp(ui = interface, server = logique)
 
