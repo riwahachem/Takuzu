@@ -2,7 +2,7 @@ choisir_difficulte <- function(taille, niveau) {
   # Initialisation du nombre de cases à remplir
   nb_cases <- 0
   if (niveau == "Facile") {
-    nb_cases <- taille * taille * 0.5
+    nb_cases <- taille * taille * 0.9
   } else if (niveau == "Normal") {
     nb_cases <- taille * taille * 0.4
   } else if (niveau == "Difficile") {
@@ -18,11 +18,13 @@ generer_takuzu <- function(taille, niveau) {
   grille <- matrix(NA, nrow = taille, ncol = taille)
 
   est_valide <- function(grille, i, j, val) {
+    # Appliquer temporairement la valeur pour les tests
     grille[i, j] <- val
     ligne <- grille[i, ]
     colonne <- grille[, j]
 
-    grille[i, j] <- NA  # Réinitialiser après test
+    # Réinitialiser pour ne pas affecter l'état de la grille à l'extérieur
+    grille[i, j] <- NA
 
     # Vérifier équilibre 0/1
     if (sum(ligne == 0, na.rm = TRUE) > taille / 2 || sum(ligne == 1, na.rm = TRUE) > taille / 2) return(FALSE)
@@ -34,7 +36,35 @@ generer_takuzu <- function(taille, niveau) {
       return(!any(runs$lengths > 2, na.rm = TRUE))
     }
 
-    return(check_rle(ligne) && check_rle(colonne))
+    if (!check_rle(ligne) || !check_rle(colonne)) return(FALSE)
+
+    # Vérifier l'unicité des lignes complètes
+    if (all(!is.na(ligne))) {
+      # Convertir la ligne actuelle en chaîne pour comparaison
+      ligne_str <- paste(ligne, collapse = "")
+      # Vérifier si cette ligne existe déjà ailleurs dans la grille
+      for (k in 1:taille) {
+        if (k != i && all(!is.na(grille[k, ]))) {
+          autre_ligne_str <- paste(grille[k, ], collapse = "")
+          if (ligne_str == autre_ligne_str) return(FALSE)
+        }
+      }
+    }
+
+    # Vérifier l'unicité des colonnes complètes
+    if (all(!is.na(colonne))) {
+      # Convertir la colonne actuelle en chaîne pour comparaison
+      colonne_str <- paste(colonne, collapse = "")
+      # Vérifier si cette colonne existe déjà ailleurs dans la grille
+      for (k in 1:taille) {
+        if (k != j && all(!is.na(grille[, k]))) {
+          autre_colonne_str <- paste(grille[, k], collapse = "")
+          if (colonne_str == autre_colonne_str) return(FALSE)
+        }
+      }
+    }
+
+    return(TRUE)
   }
 
   remplir_grille <- function(i, j) {
@@ -65,7 +95,6 @@ generer_takuzu <- function(taille, niveau) {
 
   return(grille)
 }
-
 verifier_takuzu <- function(grille) {
   taille <- ncol(grille)
 
@@ -73,7 +102,6 @@ verifier_takuzu <- function(grille) {
   if (!all(grille %in% c(0, 1))) return(FALSE)
 
   # Vérifie si chaque ligne et colonne a exactement la moitié de 0 et de 1
-  verification_equilibre <- function(vec) sum(vec) == taille / 2
   if (any(rowSums(grille) != taille / 2) || any(colSums(grille) != taille / 2)) return(FALSE)
 
   # Vérifie s'il y a plus de 2 chiffres identiques consécutifs
@@ -83,13 +111,18 @@ verifier_takuzu <- function(grille) {
     }
     return(TRUE)
   }
-  if (any(apply(grille, 1, verification_suite)) || any(apply(grille, 2, verification_suite))) return(FALSE)
+
+  # Vérifie si toutes les lignes/colonnes respectent la règle de non-répétition de plus de 2 chiffres identiques
+  if (!all(apply(grille, 1, verification_suite)) || !all(apply(grille, 2, verification_suite))) return(FALSE)
 
   # Vérifie l'unicité des lignes et colonnes
   verification_unicite <- function(mat) {
     lignes <- apply(mat, 1, paste, collapse = "")
     return(length(unique(lignes)) == nrow(mat))
   }
+
+  # Vérifie que toutes les lignes sont différentes les unes des autres
+  # et que toutes les colonnes sont différentes les unes des autres
   if (!verification_unicite(grille) || !verification_unicite(t(grille))) return(FALSE)
 
   return(TRUE)
