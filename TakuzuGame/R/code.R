@@ -1,18 +1,31 @@
+#' Calcule le nombre de cases à préremplir selon le niveau de difficulté
+#'
+#' @param taille Un entier représentant la taille de la grille
+#' @param niveau Le niveau de difficulté : "Débutant", "Amateur" ou "Expert"
+#' @return Le nombre de cases à préremplir dans la grille
+#' @export
 choisir_difficulte <- function(taille, niveau) {
   # Initialisation du nombre de cases à remplir
   nb_cases <- 0
-  if (niveau == "Facile") {
-    nb_cases <- taille * taille * 0.9
-  } else if (niveau == "Normal") {
+  if (niveau == "Débutant") {
+    nb_cases <- taille * taille * 0.8
+  } else if (niveau == "Amateur") {
     nb_cases <- taille * taille * 0.4
-  } else if (niveau == "Difficile") {
+  } else if (niveau == "Expert") {
     nb_cases <- taille * taille * 0.2
   } else {
-    stop("Veuillez choisir un niveau parmi : Facile, Normal, Difficile")
+    stop("Veuillez choisir un niveau parmi : Débutant, Amateur, Expert")
   }
 
   return(round(nb_cases))
 }
+
+#' Génère une grille Takuzu valide avec un niveau donné
+#'
+#' @param taille Taille de la grille
+#' @param niveau Niveau de difficulté : "Débutant", "Amateur", "Expert"
+#' @return Une matrice avec des 0, 1 et des NA pour les cases à remplir
+#' @export
 generer_takuzu <- function(taille, niveau) {
   nb_cases_prepremplies <- choisir_difficulte(taille, niveau)
   grille <- matrix(NA, nrow = taille, ncol = taille)
@@ -95,6 +108,13 @@ generer_takuzu <- function(taille, niveau) {
 
   return(grille)
 }
+
+
+#' Vérifie si une grille Takuzu est correctement remplie
+#'
+#' @param grille Une matrice remplie de 0 et 1 (sans NA)
+#' @return TRUE si la grille est valide, FALSE sinon
+#' @export
 verifier_takuzu <- function(grille) {
   taille <- ncol(grille)
 
@@ -127,6 +147,13 @@ verifier_takuzu <- function(grille) {
 
   return(TRUE)
 }
+
+
+#' Donne un indice basé sur l'état actuel de la grille Takuzu
+#'
+#' @param grille Une matrice contenant des 0, 1 et NA
+#' @return Une liste contenant un type d'indice et un message d'aide
+#' @export
 donner_indice <- function(grille) {
   taille <- nrow(grille)
   indices <- list()

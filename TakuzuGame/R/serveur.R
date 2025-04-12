@@ -1,3 +1,13 @@
+
+ligne_valide <- function(vec) {
+  nRows <- 8
+  nCols <- 8
+  if (any(is.na(vec))) return(FALSE)
+  sum(vec == 0) == nCols / 2 &&
+    sum(vec == 1) == nCols / 2 &&
+    all(rle(vec)$lengths <= 2)
+}
+
 logique <- function(input, output, session) {
   source("R/code.R")
 
@@ -8,7 +18,8 @@ logique <- function(input, output, session) {
   debut_temps <- reactiveVal(NULL)
   depart_chrono <- reactiveVal(FALSE)
 
-  rv <- reactiveValues(grille = NULL, verrouillees = NULL)
+  rv <- reactiveValues(grille = NULL, verrouillees = NULL, lignes_valides = rep(FALSE, nRows),
+                       colonnes_valides = rep(FALSE, nCols))
 
   observeEvent(input$new_game, {
     debut_temps(Sys.time())
@@ -17,6 +28,10 @@ logique <- function(input, output, session) {
     grille_init <- generer_takuzu(nRows, niveau())
     rv$grille <- grille_init
     rv$verrouillees <- !is.na(grille_init)
+
+    rv$lignes_valides <- rep(FALSE, nRows)
+    rv$colonnes_valides <- rep(FALSE, nCols)
+
     output$result <- renderText("Nouvelle partie commencée ! Bonne chance ")
   })
 
@@ -32,10 +47,17 @@ logique <- function(input, output, session) {
       fluidRow(
         lapply(1:nCols, function(j) {
           valeur_case <- rv$grille[i, j]
-          actionButton(inputId = paste("bouton", i, j, sep = "_"),
-                       label = ifelse(is.na(valeur_case), "", as.character(valeur_case)),
-                       style = "width: 50px; height: 50px; font-size: 18px; margin: 5px;",
-                       disabled = rv$verrouillees[i, j])
+          couleur_fond <- ""
+          if (rv$lignes_valides[i] || rv$colonnes_valides[j]) {
+            couleur_fond <- "background-color: #d4edda;"
+          }
+
+          actionButton(
+            inputId = paste("bouton", i, j, sep = "_"),
+            label = ifelse(is.na(valeur_case), "", as.character(valeur_case)),
+            style = paste0("width: 50px; height: 50px; font-size: 18px; margin: 5px;", couleur_fond),
+            disabled = rv$verrouillees[i, j]
+          )
         })
       )
     })
@@ -55,6 +77,10 @@ logique <- function(input, output, session) {
             valeur_nouvelle <- NA
           }
           rv$grille[i, j] <- valeur_nouvelle
+
+          # Mise à jour des lignes/colonnes valides
+          rv$lignes_valides[i] <- ligne_valide(rv$grille[i, ])
+          rv$colonnes_valides[j] <- ligne_valide(rv$grille[, j])
 
           updateActionButton(
             session,
