@@ -38,11 +38,13 @@ interface <- dashboardPage(
                     selectInput("niveau", "Niveau de difficulté", choices = c("Débutant", "Amateur", "Expert"), selected = "Amateur"),
                     actionButton("new_game", "Nouvelle Partie"),
                     br(), br(),
-                    textOutput("result"),
-                    textOutput("timer")
+                    uiOutput("timer")
                 ),
                 box(width = 8,
                     div(style = "text-align: center;", uiOutput("grille_boutons")),
+                    div(style = "margin-top: 20px; text-align: center;",
+                        uiOutput("result")
+                    ),
                     div(
                       style = "display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;",
                       actionButton("check_grid", "Vérifier", class = "btn-success"),

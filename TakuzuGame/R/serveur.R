@@ -1,13 +1,4 @@
 
-ligne_valide <- function(vec) {
-  nRows <- 8
-  nCols <- 8
-  if (any(is.na(vec))) return(FALSE)
-  sum(vec == 0) == nCols / 2 &&
-    sum(vec == 1) == nCols / 2 &&
-    all(rle(vec)$lengths <= 2)
-}
-
 logique <- function(input, output, session) {
   source("R/code.R")
 
@@ -17,9 +8,9 @@ logique <- function(input, output, session) {
   niveau <- reactive({ input$niveau })
   debut_temps <- reactiveVal(NULL)
   depart_chrono <- reactiveVal(FALSE)
+  meilleur_temps <- reactiveVal(Inf)
 
-  rv <- reactiveValues(grille = NULL, verrouillees = NULL, lignes_valides = rep(FALSE, nRows),
-                       colonnes_valides = rep(FALSE, nCols))
+  rv <- reactiveValues(grille = NULL, verrouillees = NULL)
 
   observeEvent(input$new_game, {
     debut_temps(Sys.time())
@@ -29,17 +20,24 @@ logique <- function(input, output, session) {
     rv$grille <- grille_init
     rv$verrouillees <- !is.na(grille_init)
 
-    rv$lignes_valides <- rep(FALSE, nRows)
-    rv$colonnes_valides <- rep(FALSE, nCols)
-
-    output$result <- renderText("Nouvelle partie commencée ! Bonne chance ")
+    output$result <- renderUI({
+      HTML("<p style='font-size: 20px; font-weight: bold; color: #2E3440;'> C’est parti, bonne chance ! </p>")
+    })
   })
 
-  output$timer <- renderText({
+  output$timer <- renderUI({
     req(debut_temps(), depart_chrono())
     invalidateLater(1000, session)
-    temps_ecoule <- difftime(Sys.time(), debut_temps(), units = "secs")
-    paste("Temps écoulé :", round(temps_ecoule), "secondes")
+    temps_ecoule <- round(difftime(Sys.time(), debut_temps(), units = "secs"))
+
+    texte <- paste0("⏱️ Temps écoulé : ", temps_ecoule, " secondes")
+
+    if (!is.infinite(meilleur_temps())) {
+      texte <- paste0(texte,
+                      "<br>🏆 Meilleur temps : ", meilleur_temps(), " secondes")
+    }
+
+    HTML(paste0("<p style='margin: 0;'>", texte, "</p>"))
   })
 
   output$grille_boutons <- renderUI({
@@ -47,15 +45,10 @@ logique <- function(input, output, session) {
       fluidRow(
         lapply(1:nCols, function(j) {
           valeur_case <- rv$grille[i, j]
-          couleur_fond <- ""
-          if (rv$lignes_valides[i] || rv$colonnes_valides[j]) {
-            couleur_fond <- "background-color: #d4edda;"
-          }
-
           actionButton(
             inputId = paste("bouton", i, j, sep = "_"),
             label = ifelse(is.na(valeur_case), "", as.character(valeur_case)),
-            style = paste0("width: 50px; height: 50px; font-size: 18px; margin: 5px;", couleur_fond),
+            style = "width: 50px; height: 50px; font-size: 18px; margin: 5px;",
             disabled = rv$verrouillees[i, j]
           )
         })
@@ -78,10 +71,6 @@ logique <- function(input, output, session) {
           }
           rv$grille[i, j] <- valeur_nouvelle
 
-          # Mise à jour des lignes/colonnes valides
-          rv$lignes_valides[i] <- ligne_valide(rv$grille[i, ])
-          rv$colonnes_valides[j] <- ligne_valide(rv$grille[, j])
-
           updateActionButton(
             session,
             paste("bouton", i, j, sep = "_"),
@@ -96,10 +85,18 @@ logique <- function(input, output, session) {
     if (verifier_takuzu(rv$grille)) {
       depart_chrono(FALSE)
       delta_temps <- difftime(Sys.time(), debut_temps(), units = "secs")
-      output$timer <- renderText({paste("Temps écoulé :", round(delta_temps), "secondes")})
-      output$result <- renderText("🎉 Bravo, vous avez réussi !")
+      if (as.numeric(delta_temps) < meilleur_temps()) {
+        meilleur_temps(round(as.numeric(delta_temps)))
+      }
+      #output$timer <- renderText({paste("Temps écoulé :", round(delta_temps), "secondes")})
+      output$result <- renderUI({
+        HTML("<p style='font-size: 20px; font-weight: bold; color: #2E3440;'> Grille complétée ! Bravo ! </p>")
+      })
     } else {
-      output$result <- renderText("La grille n'est pas bonne, réessayez !")
+      output$result <- renderUI({
+        HTML("<p style='font-size: 20px; font-weight: bold; color: #2E3440;'> Il reste des erreurs.. Réessayez !</p>")
+      })
+
     }
   })
   observeEvent(input$hint, {
