@@ -8,7 +8,17 @@ logique <- function(input, output, session) {
   niveau <- reactive({ input$niveau })
   debut_temps <- reactiveVal(NULL)
   depart_chrono <- reactiveVal(FALSE)
-  meilleur_temps <- reactiveVal(Inf)
+  meilleurs_temps <- reactiveValues(
+    Débutant = Inf,
+    Amateur = Inf,
+    Expert = Inf
+  )
+  meilleur_actuel <- reactive({
+    switch(niveau(),
+           "Débutant" = meilleurs_temps$Débutant,
+           "Amateur" = meilleurs_temps$Amateur,
+           "Expert" = meilleurs_temps$Expert)
+  })
 
   rv <- reactiveValues(grille = NULL, verrouillees = NULL)
 
@@ -32,9 +42,8 @@ logique <- function(input, output, session) {
 
     texte <- paste0("⏱️ Temps écoulé : ", temps_ecoule, " secondes")
 
-    if (!is.infinite(meilleur_temps())) {
-      texte <- paste0(texte,
-                      "<br>🏆 Meilleur temps : ", meilleur_temps(), " secondes")
+    if (!is.infinite(meilleur_actuel())) {
+      texte <- paste0(texte, "<br>🏆 Meilleur temps : ", meilleur_actuel(), " secondes")
     }
 
     HTML(paste0("<p style='margin: 0;'>", texte, "</p>"))
@@ -85,10 +94,12 @@ logique <- function(input, output, session) {
     if (verifier_takuzu(rv$grille)) {
       depart_chrono(FALSE)
       delta_temps <- difftime(Sys.time(), debut_temps(), units = "secs")
-      if (as.numeric(delta_temps) < meilleur_temps()) {
-        meilleur_temps(round(as.numeric(delta_temps)))
+      delta <- round(as.numeric(delta_temps))
+      niv <- niveau()
+
+      if (delta < meilleurs_temps[[niv]]) {
+        meilleurs_temps[[niv]] <- delta
       }
-      #output$timer <- renderText({paste("Temps écoulé :", round(delta_temps), "secondes")})
       output$result <- renderUI({
         HTML("<p style='font-size: 20px; font-weight: bold; color: #2E3440;'> Grille complétée ! Bravo ! </p>")
       })

@@ -10,9 +10,9 @@ choisir_difficulte <- function(taille, niveau) {
   if (niveau == "Débutant") {
     nb_cases <- taille * taille * 0.8
   } else if (niveau == "Amateur") {
-    nb_cases <- taille * taille * 0.4
+    nb_cases <- taille * taille * 0.6
   } else if (niveau == "Expert") {
-    nb_cases <- taille * taille * 0.2
+    nb_cases <- taille * taille * 0.3
   } else {
     stop("Veuillez choisir un niveau parmi : Débutant, Amateur, Expert")
   }
