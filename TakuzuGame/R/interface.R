@@ -22,7 +22,6 @@ mon_theme <- create_theme(
 
 
 interface <- dashboardPage(
-  #dashboardHeader(title = "Takuzu Game"),
   dashboardHeader(
     title = tags$div(
       id = "go_home",  # ID pour détecter le clic
@@ -41,6 +40,31 @@ interface <- dashboardPage(
   dashboardBody(
     use_theme(mon_theme),
     useShinyjs(),
+    tags$head(
+      tags$style(HTML("
+    .zoomIn {
+      animation: zoomIn 0.5s ease forwards;
+    }
+    @keyframes zoomIn {
+      from {transform: scale(0.8); opacity: 0;}
+      to {transform: scale(1); opacity: 1;}
+    }
+
+    .shake {
+    animation: shake 0.7s ease-in-out;
+  }
+  @keyframes shake {
+    0% { transform: translateX(0px); }
+    15% { transform: translateX(-10px); }
+    30% { transform: translateX(10px); }
+    45% { transform: translateX(-10px); }
+    60% { transform: translateX(10px); }
+    75% { transform: translateX(-5px); }
+    90% { transform: translateX(5px); }
+    100% { transform: translateX(0px); }
+  }
+  "))
+    ),
     tags$script( HTML("
                       $(document).on('click', '#go_home', function() {
                         Shiny.setInputValue('go_home', Math.random());
@@ -57,9 +81,7 @@ interface <- dashboardPage(
                 ),
                 box(width = 8,
                     div(style = "text-align: center;", uiOutput("grille_boutons")),
-                    div(style = "margin-top: 20px; text-align: center;",
-                        uiOutput("result")
-                    ),
+                    div(id = "result_zone", style = "margin-top: 25px; text-align: center;", uiOutput("result")),
                     div(
                       style = "display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;",
                       actionButton("hint", icon = icon("lightbulb"), "Indice", class = "btn-warning")
@@ -68,13 +90,19 @@ interface <- dashboardPage(
             )
       ),
       tabItem(tabName = "règles",
-              h3("Règles du jeu"),
-              p("Le but du jeu est de remplir la grille en respectant les règles suivantes :"),
-              tags$ul(
-                tags$li("Chaque case doit contenir un 0 ou un 1."),
-                tags$li("Chaque ligne et chaque colonne doivent contenir autant de 0 que de 1."),
-                tags$li("Il est interdit d'avoir trois 0 ou trois 1 consécutifs dans une ligne ou une colonne."),
-                tags$li("Deux lignes ou deux colonnes identiques sont interdites dans la même grille.")
+              box(
+                width = 12,
+                title = tagList(" Règles du jeu"),
+                status = "primary",
+                solidHeader = TRUE,
+                style = "font-size: 18px; line-height: 1.8;",
+                p("Le but du jeu est de remplir la grille en respectant les règles suivantes :"),
+                tags$ul(
+                  tags$li("Chaque case doit contenir un 0 ou un 1."),
+                  tags$li("Chaque ligne et chaque colonne doivent contenir autant de 0 que de 1."),
+                  tags$li("Il est interdit d'avoir trois 0 ou trois 1 consécutifs dans une ligne ou une colonne."),
+                  tags$li("Deux lignes ou deux colonnes identiques sont interdites dans la même grille.")
+                )
               )
       ),
       tabItem(tabName = "about",

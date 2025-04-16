@@ -31,7 +31,7 @@ logique <- function(input, output, session) {
     rv$verrouillees <- !is.na(grille_init)
 
     output$result <- renderUI({
-      HTML("<p style='font-size: 20px; font-weight: bold; color: #2E3440;'> C’est parti, bonne chance ! </p>")
+      HTML("<p style='font-size: 25px; font-weight: bold; color: #2E3440;'> C’est parti, bonne chance ! </p>")
     })
   })
 
@@ -97,18 +97,24 @@ logique <- function(input, output, session) {
               }
 
               shinyjs::runjs("
-      $('#result').hide().fadeIn(800).css({'transform': 'scale(1.1)', 'transition': 'all 0.3s ease-in-out'});
-      setTimeout(function(){
-        $('#result').css({'transform': 'scale(1)'});
-      }, 500);
-    ")
+                $('#result').hide().fadeIn(800).css({'transform': 'scale(1.1)', 'transition': 'all 0.3s ease-in-out'});
+                  setTimeout(function(){
+                  $('#result').css({'transform': 'scale(1)'});
+                  }, 500);
+              ")
+
+              # Animation de victoire
+              shinyjs::runjs("$('#result_zone').removeClass().addClass('zoomIn');")
 
               output$result <- renderUI({
-                HTML("<p id='result' style='font-size: 20px; font-weight: bold; color: green;'>🎉 Grille complétée ! Bravo !</p>")
+                HTML("<p style='font-size: 25px; font-weight: bold; color: green;'>🎉 Grille complétée ! Bravo !</p>")
               })
             } else {
+              # Animation de défaite
+              shinyjs::runjs("$('#result_zone').removeClass().addClass('shake');")
+
               output$result <- renderUI({
-                HTML("<p id='result' style='font-size: 20px; font-weight: bold; color: #C0392B;'>⛔ La grille est pleine mais incorrecte. Réessayez !</p>")
+                HTML("<p style='font-size: 25px; font-weight: bold; color: #C0392B;'>⛔ La grille est pleine mais incorrecte. Réessayez !</p>")
               })
             }
           }
