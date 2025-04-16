@@ -85,30 +85,37 @@ logique <- function(input, output, session) {
             paste("bouton", i, j, sep = "_"),
             label = ifelse(is.na(valeur_nouvelle), "", as.character(valeur_nouvelle))
           )
+          # Vérifier automatiquement si la grille est complète
+          if (all(!is.na(rv$grille))) {
+            if (verifier_takuzu(rv$grille)) {
+              depart_chrono(FALSE)
+              delta <- round(as.numeric(difftime(Sys.time(), debut_temps(), units = "secs")))
+              niv <- niveau()
+
+              if (delta < meilleurs_temps[[niv]]) {
+                meilleurs_temps[[niv]] <- delta
+              }
+
+              shinyjs::runjs("
+      $('#result').hide().fadeIn(800).css({'transform': 'scale(1.1)', 'transition': 'all 0.3s ease-in-out'});
+      setTimeout(function(){
+        $('#result').css({'transform': 'scale(1)'});
+      }, 500);
+    ")
+
+              output$result <- renderUI({
+                HTML("<p id='result' style='font-size: 20px; font-weight: bold; color: green;'>🎉 Grille complétée ! Bravo !</p>")
+              })
+            } else {
+              output$result <- renderUI({
+                HTML("<p id='result' style='font-size: 20px; font-weight: bold; color: #C0392B;'>⛔ La grille est pleine mais incorrecte. Réessayez !</p>")
+              })
+            }
+          }
+
         })
       })
     })
-  })
-
-  observeEvent(input$check_grid, {
-    if (verifier_takuzu(rv$grille)) {
-      depart_chrono(FALSE)
-      delta_temps <- difftime(Sys.time(), debut_temps(), units = "secs")
-      delta <- round(as.numeric(delta_temps))
-      niv <- niveau()
-
-      if (delta < meilleurs_temps[[niv]]) {
-        meilleurs_temps[[niv]] <- delta
-      }
-      output$result <- renderUI({
-        HTML("<p style='font-size: 20px; font-weight: bold; color: #2E3440;'> Grille complétée ! Bravo ! </p>")
-      })
-    } else {
-      output$result <- renderUI({
-        HTML("<p style='font-size: 20px; font-weight: bold; color: #2E3440;'> Il reste des erreurs.. Réessayez !</p>")
-      })
-
-    }
   })
   observeEvent(input$hint, {
     # Vérifier si une partie est en cours

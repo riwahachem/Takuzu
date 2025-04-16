@@ -1,6 +1,7 @@
 library(shiny)
 library(shinydashboard)
 library(fresh)
+library(shinyjs)
 
 # Création d'un thème personnalisé
 mon_theme <- create_theme(
@@ -39,6 +40,7 @@ interface <- dashboardPage(
   ),
   dashboardBody(
     use_theme(mon_theme),
+    useShinyjs(),
     tags$script( HTML("
                       $(document).on('click', '#go_home', function() {
                         Shiny.setInputValue('go_home', Math.random());
@@ -60,7 +62,6 @@ interface <- dashboardPage(
                     ),
                     div(
                       style = "display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;",
-                      actionButton("check_grid", "Vérifier", class = "btn-success"),
                       actionButton("hint", icon = icon("lightbulb"), "Indice", class = "btn-warning")
                     )
               )
