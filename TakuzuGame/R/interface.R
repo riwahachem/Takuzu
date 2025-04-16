@@ -21,9 +21,17 @@ mon_theme <- create_theme(
 
 
 interface <- dashboardPage(
-  dashboardHeader(title = "Takuzu Game"),
+  #dashboardHeader(title = "Takuzu Game"),
+  dashboardHeader(
+    title = tags$div(
+      id = "go_home",  # ID pour détecter le clic
+      style = "cursor: pointer; color: white;",
+      "Takuzu Game"
+    )
+  ),
   dashboardSidebar(
     sidebarMenu(
+      id = "tabs",
       menuItem("Jouer", tabName = "play"),
       menuItem("Règles", tabName = "règles"),
       menuItem("  À propos", tabName = "about", icon = icon("info-circle"))
@@ -31,6 +39,11 @@ interface <- dashboardPage(
   ),
   dashboardBody(
     use_theme(mon_theme),
+    tags$script( HTML("
+                      $(document).on('click', '#go_home', function() {
+                        Shiny.setInputValue('go_home', Math.random());
+                      });
+                      ")),
     tabItems(
       tabItem(tabName = "play",
               fluidRow(

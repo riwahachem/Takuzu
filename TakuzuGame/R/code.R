@@ -116,6 +116,7 @@ generer_takuzu <- function(taille, niveau) {
 #' @return TRUE si la grille est valide, FALSE sinon
 #' @export
 verifier_takuzu <- function(grille) {
+
   taille <- ncol(grille)
 
   # Vérifie si la grille contient uniquement des 0 et des 1

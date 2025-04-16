@@ -140,4 +140,8 @@ logique <- function(input, output, session) {
     }
   })
 
+  observeEvent(input$go_home, {
+    updateTabItems(session, "tabs", selected = "play")
+  })
+
 }
