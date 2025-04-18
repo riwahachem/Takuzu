@@ -22,7 +22,7 @@ Le **Takuzu** se joue sur une grille carrée (souvent 8×8) et suit les règles 
 - **Trois niveaux de difficulté** : Débutant, Amateur, Expert
 - **Chronomètre intégré**
 - **Système d’indices**
-- **Vérification automatique** de la solution
+- **Vérification automatique de la solution**
 
 ---
 

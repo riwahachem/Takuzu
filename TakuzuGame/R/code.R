@@ -253,9 +253,8 @@ donner_indice <- function(grille) {
   cases_vides <- which(is.na(grille), arr.ind = TRUE)
   if (nrow(cases_vides) > 0) {
     case_aleatoire <- cases_vides[sample(nrow(cases_vides), 1), ]
-    return(list(type = "general", indice = paste("Essayez de remplir la case à la ligne",
-                                                 case_aleatoire[1], "et à la colonne", case_aleatoire[2],
-                                                 "en vous basant sur les règles du jeu.")))
+    return(list(type = "general", indice = paste("La case ligne", case_aleatoire[1], "colonne", case_aleatoire[2],
+                                                 "est encore vide. Essayez de la déduire logiquement si possible.")))
   }
 
   return(list(type = "aucun", indice = "La grille semble complète. Vérifiez si elle respecte toutes les règles du jeu."))
