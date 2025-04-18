@@ -111,9 +111,18 @@ interface <- dashboardPage(
                 title = "À propos de cette application",
                 status = "success",
                 solidHeader = TRUE,
-                p("Cette application a été développée par Wahel El Mazzouji et Riwa Hachem Reda dans le cadre d'un projet universitaire pour le cours de ",
-                  em("Programmation R"), " sous la direction de Jean-Michel Marin.")
+                p("Cette application a été développée par ",
+                  strong("Wahel El Mazzouji"), " et ",
+                  strong("Riwa Hachem Reda"), " dans le cadre d'un projet universitaire pour le cours de ",
+                  em("Programmation R"), " sous la direction de ",
+                  strong("Jean-Michel Marin.")),
+                p("L'objectif de ce projet est de fournir une interface interactive pour jouer au Takuzu tout en respectant les règles du jeu."),
+                p("Technologies utilisées : ",
+                  span(class = "label label-default", "R"), ", ",
+                  span(class = "label label-default", "Shiny"), ", ",
+                  span(class = "label label-default", "shinydashboard"))
               )
+
       )
     )
   )
