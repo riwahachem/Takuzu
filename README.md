@@ -23,7 +23,7 @@ Le **Takuzu** se joue sur une grille carrée (souvent 8×8) et suit les règles 
 - **Chronomètre intégré**
 - **Système d’indices**
 - **Vérification automatique de la solution**
-
+- **Possibilité de changer de thème (clair/sombre)**
 ---
 
 ## Pré-requis
