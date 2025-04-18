@@ -92,10 +92,10 @@ interface <- dashboardPage(
       tabItem(tabName = "règles",
               box(
                 width = 12,
-                title = tagList(" Règles du jeu"),
+                title = div(style = "font-size: 22px; font-weight: bold; color: #333;", "Règles du jeu"),
                 status = "primary",
                 solidHeader = TRUE,
-                style = "font-size: 18px; line-height: 1.8;",
+                style = "font-size: 18px; line-height: 1.8; padding: 15px;",
                 p("Le but du jeu est de remplir la grille en respectant les règles suivantes :"),
                 tags$ul(
                   tags$li("Chaque case doit contenir un 0 ou un 1."),
@@ -104,6 +104,8 @@ interface <- dashboardPage(
                   tags$li("Deux lignes ou deux colonnes identiques sont interdites dans la même grille.")
                 )
               )
+
+
       ),
       tabItem(tabName = "about",
               box(
