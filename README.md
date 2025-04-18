@@ -2,43 +2,74 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## Description
-Le Takuzu Game est une application interactive développée avec [Shiny](https://shiny.rstudio.com/) en R par Wahel El Mazzouji et Riwa Hachem Reda. Elle permet aux utilisateurs de jouer au jeu de logique Takuzu, également connu sous le nom de Binairo.
-Le but du jeu est de remplir une grille en respectant certaines règles spécifiques tout en s'amusant avec une interface intuitive.
+**Takuzu Game** est une application web interactive développée en R avec [Shiny](https://shiny.rstudio.com/). Elle permet de jouer au célèbre jeu de logique **Takuzu**, également connu sous le nom de **Binairo**.
 
-## Règles du jeu
-Le Takuzu (aussi appelé Binairo) est un jeu de logique qui se joue sur une grille carrée. Voici les règles à respecter :
+Le but du jeu ? Remplir une grille binaire tout en respectant des règles simples mais exigeantes.
 
-1. **Remplissage binaire** : Chaque case doit contenir soit un 0, soit un 1.
+---
 
-2. **Équilibre parfait** : Chaque ligne et chaque colonne doit contenir exactement le même nombre de 0 et de 1.
+## 🧩 Règles du jeu
+Le **Takuzu** se joue sur une grille carrée (souvent 8×8) et suit les règles suivantes :
 
-3. **Pas de triplets** : Il est interdit d'avoir trois 0 ou trois 1 consécutifs, que ce soit horizontalement ou verticalement.
+1. Chaque case doit contenir un `0` ou un `1`.
+2. Chaque ligne et chaque colonne doit contenir autant de `0` que de `1`.
+3. Il est interdit d’avoir trois `0` ou trois `1` consécutifs (horizontalement ou verticalement).
+4. Aucune ligne ne doit être identique à une autre. Même contrainte pour les colonnes.
 
-4. **Lignes et colonnes uniques** : Aucune ligne ne peut être identique à une autre ligne. De même, aucune colonne ne peut être identique à une autre colonne.
+---
+
+## ⚙️ Fonctionnalités
+- **Trois niveaux de difficulté** : Débutant, Amateur, Expert
+- **Chronomètre intégré**
+- **Système d’indices**
+- **Vérification automatique** de la solution
+
+---
+
+## Pré-requis
+Assurez-vous d’avoir installé :
+- [R](https://cran.r-project.org/)
+- [RStudio](https://posit.co/download/rstudio-desktop/)
+
+Packages R nécessaires :
+- [`shiny`](https://cran.r-project.org/web/packages/shiny/index.html)
+- [`shinydashboard`](https://cran.r-project.org/web/packages/shinydashboard/index.html)
+- [`shinyWidgets`](https://cran.r-project.org/web/packages/shinyWidgets/index.html)
+- [`shinyalert`](https://cran.r-project.org/web/packages/shinyalert/index.html)
+- [`devtools`](https://cran.r-project.org/web/packages/devtools/index.html)
+
+
+### Installation des packages
+Dans la console R :
+```R
+install.packages(c("shiny", "shinydashboard", "shinyWidgets", "shinyalert", "devtools"))
+```
+
+## Lancer l’application
+
+1. Clonez notre dépôt sur votre machine :
+
+```bash
+git clone https://github.com/riwahachem/Takuzu.git
+```
+
+2. Installez le package localement avec devtools::install_local() :
+
+```R
+devtools::install_local("./Takuzu/TakuzuGame", force = TRUE)
+```
+3. Chargez le package :
+
+```R
+library(TakuzuGame)
+```
+
+4. Vous pouvez maintenant lancer l’application Takuzu 
+
+```R
+shiny::runApp("./Takuzu/TakuzuGame/app.R")
+```
 
 ## Auteurs
 - **Riwa Hachem Reda** - [riwahachemreda@gmail.com](mailto:riwahachemreda@gmail.com)
 - **Wahel El Mazzouji** - [wahel.el-mazzouji@etu.umontpellier.fr](mailto:wahel.el-mazzouji@etu.umontpellier.fr)
-
-## Installation
-### Prérequis
-- R et RStudio doivent être installés sur votre machine.
-- Les packages R suivants sont nécessaires : [shiny](https://cran.r-project.org/web/packages/shiny/index.html), [shinydashboard](https://cran.r-project.org/web/packages/shinydashboard/index.html), [shinyWidgets](https://cran.r-project.org/web/packages/shinyWidgets/index.html), [shinyalert](https://cran.r-project.org/web/packages/shinyalert/index.html).
-
-### Installation des Packages
-Dans votre console R, exécutez la commande suivante pour installer les packages requis :
-```R
-install.packages(c("shiny", "shinydashboard", "shinyWidgets", "shinyalert"))
-```
-
-### Exécution de l'application
-1. Clonez ce dépôt sur votre machine locale
-2. Ouvrez le projet dans RStudio
-3. Exécutez le fichier `app.R`
-
-## Fonctionnalités
-- Grille de jeu 8×8
-- Trois niveaux de difficulté : Facile, Normal, Difficile
-- Chronomètre intégré
-- Système d'indices
-- Vérification automatique de la solution
