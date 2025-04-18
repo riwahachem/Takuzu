@@ -38,13 +38,6 @@ Packages R nécessaires :
 - [`shinyalert`](https://cran.r-project.org/web/packages/shinyalert/index.html)
 - [`devtools`](https://cran.r-project.org/web/packages/devtools/index.html)
 
-
-### Installation des packages
-Dans la console R :
-```R
-install.packages(c("shiny", "shinydashboard", "shinyWidgets", "shinyalert", "devtools"))
-```
-
 ## Lancer l’application
 
 1. Clonez notre dépôt sur votre machine :
