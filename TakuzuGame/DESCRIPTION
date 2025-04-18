@@ -2,8 +2,8 @@ Package: TakuzuGame
 Title: Bibliothèque pour le jeu Takuzu
 Version: 0.1.0
 Authors@R: 
-    person("Riwa", "Hachem Reda", "riwahachemreda@gmail.com")
-    person("Wahel","El Mazzouji", "wahel.el-mazzouji@etu.umontpellier.fr")
+    person("Riwa", "Hachem Reda", email= "riwahachemreda@gmail.com", role = c("aut", "cre"))
+    person("Wahel","El Mazzouji", email = "wahel.el-mazzouji@etu.umontpellier.fr", role = "aut")
 Description: Ce package fournit les fonctions de base permettant de jouer au Takuzu.
 License: MIT
 Encoding: UTF-8
