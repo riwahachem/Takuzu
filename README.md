@@ -53,12 +53,19 @@ install.packages(c("shiny", "shinydashboard", "shinyWidgets", "shinyalert", "dev
 git clone https://github.com/riwahachem/Takuzu.git
 ```
 
-2. Installez le package localement avec devtools::install_local() :
+2. Installation des packages
+   
+```R
+setwd("~/Takuzu")
+install.packages(c("shiny", "shinydashboard", "shinyWidgets", "shinyalert", "devtools"))
+```
+
+3. Installez le package localement avec devtools::install_local() :
 
 ```R
 devtools::install_local("./Takuzu/TakuzuGame", force = TRUE)
 ```
-3. Chargez le package :
+4. Chargez le package :
 
 ```R
 library(TakuzuGame)
