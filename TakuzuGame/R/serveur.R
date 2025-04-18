@@ -1,6 +1,37 @@
 
+# Logique du serveur
 logique <- function(input, output, session) {
   source("R/code.R")
+
+  # Ajouter une valeur réactive pour le thème
+  theme_actuel <- reactiveVal("clair")
+
+  # Observer le changement de thème
+  observeEvent(input$switch_theme, {
+    if(input$switch_theme) {
+      theme_actuel("sombre")
+    } else {
+      theme_actuel("clair")
+    }
+  })
+
+  # Générer dynamiquement le theme
+  output$theme_selector <- renderUI({
+    if(theme_actuel() == "clair") {
+      use_theme(theme_clair)
+    } else {
+      use_theme(theme_sombre)
+    }
+  })
+
+  # Appliquer des styles CSS supplémentaires selon le thème
+  observe({
+    if(theme_actuel() == "sombre") {
+      shinyjs::addClass(selector = "body", class = "dark-mode")
+    } else {
+      shinyjs::removeClass(selector = "body", class = "dark-mode")
+    }
+  })
 
   nRows <- 8
   nCols <- 8
@@ -31,7 +62,7 @@ logique <- function(input, output, session) {
     rv$verrouillees <- !is.na(grille_init)
 
     output$result <- renderUI({
-      HTML("<p style='font-size: 25px; font-weight: bold; color: #2E3440;'> C’est parti, bonne chance ! </p>")
+      HTML("<p style='font-size: 25px; font-weight: bold;'> C'est parti, bonne chance ! </p>")
     })
   })
 
@@ -54,10 +85,13 @@ logique <- function(input, output, session) {
       fluidRow(
         lapply(1:nCols, function(j) {
           valeur_case <- rv$grille[i, j]
+          button_class <- "grid-button"  # Classe CSS personnalisée pour les boutons de la grille
+
           actionButton(
             inputId = paste("bouton", i, j, sep = "_"),
             label = ifelse(is.na(valeur_case), "", as.character(valeur_case)),
             style = "width: 50px; height: 50px; font-size: 18px; margin: 5px;",
+            class = button_class,
             disabled = rv$verrouillees[i, j]
           )
         })
@@ -85,6 +119,7 @@ logique <- function(input, output, session) {
             paste("bouton", i, j, sep = "_"),
             label = ifelse(is.na(valeur_nouvelle), "", as.character(valeur_nouvelle))
           )
+
           # Vérifier automatiquement si la grille est complète
           if (all(!is.na(rv$grille))) {
             if (verifier_takuzu(rv$grille)) {
@@ -98,9 +133,9 @@ logique <- function(input, output, session) {
 
               shinyjs::runjs("
                 $('#result').hide().fadeIn(800).css({'transform': 'scale(1.1)', 'transition': 'all 0.3s ease-in-out'});
-                  setTimeout(function(){
+                setTimeout(function(){
                   $('#result').css({'transform': 'scale(1)'});
-                  }, 500);
+                }, 500);
               ")
 
               # Animation de victoire
@@ -118,11 +153,11 @@ logique <- function(input, output, session) {
               })
             }
           }
-
         })
       })
     })
   })
+
   observeEvent(input$hint, {
     # Vérifier si une partie est en cours
     if (is.null(rv$grille)) {
@@ -156,5 +191,4 @@ logique <- function(input, output, session) {
   observeEvent(input$go_home, {
     updateTabItems(session, "tabs", selected = "play")
   })
-
 }
