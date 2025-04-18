@@ -2,11 +2,14 @@ Package: TakuzuGame
 Type: Package
 Title: Bibliothèque pour le jeu Takuzu
 Version: 0.1.0
-Authors@R: 
-    person("Riwa", "Hachem Reda", email= "riwahachemreda@gmail.com", role = c("aut", "cre"))
-    person("Wahel","El Mazzouji", email = "wahel.el-mazzouji@etu.umontpellier.fr", role = c("aut"))
+Author: Riwa Hachem Reda [aut, cre], Wahel El Mazzouji [aut]
+Maintainer: Riwa Hachem Reda <riwahachemreda@gmail.com>
 Description: Ce package fournit les fonctions de base permettant de jouer au Takuzu.
 License: MIT
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Authors@R: c(
+  person(given = "Riwa", family = "Hachem Reda", role = c("aut", "cre"), email = "riwahachemreda@gmail.com"),
+  person(given = "Wahel", family = "El Mazzouji", role = "aut", email = "wahel.el-mazzouji@etu.umontpellier.fr")
+)
